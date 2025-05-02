@@ -1,0 +1,36 @@
+---
+- name: Using debug module
+  hosts: localhost
+
+#  vars:
+#    software:
+#      - java
+#      - python
+#      - maven
+
+  vars:
+    software:
+      - name: java
+        required: true
+      - name: python
+        required: true
+      - name: maven
+        required: false
+
+  tasks:
+    - name: show ansible facts
+      debug:
+        var: ansible_facts
+
+    - name: run condition on the basis of facts
+      command: echo 'done'
+      when: ansible_facts.pkg_mgr == 'apt'
+
+    - name: display message
+      debug:
+        msg: 'This msg is from debug module'
+
+    - name: installing {{ item.name }}
+      command: echo 'installing {{ item.name }}'
+      when: item.required
+      loop: '{{ software }}'

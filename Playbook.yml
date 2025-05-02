@@ -1,0 +1,25 @@
+---
+- name: Play1
+  hosts: localhost
+  vars:
+    day: 5th may
+
+  tasks:
+#    - include_vars: vars.yml #for external var file for all your variables
+    - name: helloworld
+      shell: echo "hello world"
+
+    - name: date
+      command: date
+
+    - name: display contents of a file
+      command: cat resolv.conf chdir=/etc
+
+    - name: run a script
+      script: sh
+
+    - name: add line to file
+      lineinfile:
+        path: sh
+        line: 'day - {{ day }}'
+
