@@ -1,0 +1,53 @@
+---
+
+- name: Installing Tomcat
+  hosts: nodes
+  become: yes
+
+  vars:
+    tomcat_path: /opt/tomcat
+    package_name: tomcat
+    source_dist: https://archive.apache.org/dist/tomcat/tomcat-9/v9.0.65/bin/apache-tomcat-9.0.65.tar.gz
+
+  tasks:
+    - name: update system package
+      apt:
+        upgrade: yes
+        update_cache: yes
+
+    - name: Install java
+      apt:
+        name: openjdk-11-jdk
+        state: present
+
+    - name:  Create Tomcat User
+      user:
+        name: { { package_name } }
+        state: present
+
+    - name: Create Tomcat Group
+      group:
+        name: { { package_name } }
+        state: present
+
+    - name: Create directory
+      file:
+        path: "{{ tomcat_path }}"
+        state: directory
+        owner: { { package_name } }
+        group: { { package_name } }
+        mode: 755
+        recurse: yes
+
+    - name: Download Tomcat and Unarchive
+      unarchive:
+        src: {{ source_dist }}
+        dest: {{ tomcat_path }}
+        remote_src: yes
+        extra_opts: [--strip-components=1]
+
+    - name: Start Tomcat
+      command: sh {{ tomcat_path }}/bin/start.sh
+
+    - name: Allow TCP connections
+      command: sudo ufw allow 8080/tcp
