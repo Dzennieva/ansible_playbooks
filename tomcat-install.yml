@@ -51,3 +51,11 @@
 
     - name: Allow TCP connections
       command: sudo ufw allow 8080/tcp
+
+    - name: connect to tomcat on port 8080
+      uri:
+        url: http://localhost:8080
+        register: output
+        until: "output.status==200"
+        retries: 2
+        delay: 2
